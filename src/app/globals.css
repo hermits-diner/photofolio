@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/*
+  Contact sheet.
+
+  The page is a sheet of fibre paper on a light table, not a dark gallery
+  wall. Frames sit in a black rebate field the way they do on a real proof
+  sheet; the paper margin around it stays light. Colour is doing structural
+  work here, so nothing else needs to.
+*/
+@theme {
+  --color-paper: #e9eae6; /* cool fixed RC paper */
+  --color-paper-shade: #dcddd7; /* the sheet's own shadow */
+  --color-rebate: #141310; /* developed silver, warm black */
+  --color-silver: #6e6f6a; /* captions, secondary data */
+  --color-grease: #c8102e; /* chinagraph — selects only, never decoration */
+  --color-selenium: #241f29; /* selenium-toned scrim behind a print */
+
+  /* Latin first, Hangul second — the browser falls back per glyph. */
+  --font-display: var(--font-barlow-condensed), var(--font-gothic-a1),
+    "Arial Narrow", sans-serif;
+  --font-body: var(--font-newsreader), var(--font-nanum-myeongjo), Georgia, serif;
+  --font-data: var(--font-spline-mono), var(--font-gothic-a1), ui-monospace,
+    monospace;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-rebate);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+/*
+  Edge lettering — the stamped text along a film rebate. Wide tracking is
+  what makes it read as stamped, so this is for Latin and figures only.
+*/
+.rebate-type {
+  font-family: var(--font-data);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/*
+  The same small-print role in Korean. Hangul is already a fixed-width
+  square; tracking it out to 0.22em just pulls the syllables apart.
+*/
+.note {
+  font-family: var(--font-data);
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+/*
+  The latent image appearing in developer: flat and pale, then it snaps to
+  a full print scale. One orchestrated moment for the whole page.
+*/
+@keyframes develop {
+  from {
+    opacity: 0.32;
+    filter: brightness(1.55) contrast(0.28);
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1) contrast(1);
+    transform: scale(1);
+  }
+}
+
+.develops {
+  animation: develop 1200ms cubic-bezier(0.22, 0.68, 0.3, 1) both;
+  animation-delay: var(--develop-delay, 0ms);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-grease);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .develops {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
