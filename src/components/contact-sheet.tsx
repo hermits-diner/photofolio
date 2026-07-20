@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 
-import type { Frame } from "@/data/roll";
+import type { Frame } from "@/content";
 import { cn } from "@/lib/utils";
 
 /**
@@ -78,15 +78,17 @@ function Cell({
       <button
         type="button"
         onClick={() => onOpen(index)}
-        aria-label={`${frame.edge}번 프레임 크게 보기 — ${frame.caption}`}
+        aria-label={`${frame.edge}번 프레임 크게 보기${frame.caption ? ` — ${frame.caption}` : ""}`}
         className="group relative block aspect-3/2 w-full cursor-zoom-in overflow-hidden bg-rebate"
       >
         <Image
-          src={frame.src}
+          src={frame.image.url}
           alt={frame.alt}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           quality={70}
+          placeholder={frame.image.blurDataURL ? "blur" : "empty"}
+          blurDataURL={frame.image.blurDataURL}
           className={cn(
             "object-cover transition-[filter] duration-500 group-hover:brightness-110",
             developed && "develops",
@@ -128,10 +130,10 @@ export function ContactSheet({ frames }: { frames: Frame[] }) {
         index={Math.max(openAt, 0)}
         close={() => setOpenAt(-1)}
         slides={frames.map((f) => ({
-          src: f.src,
+          src: f.image.url,
           alt: f.alt,
-          width: 1500,
-          height: 1000,
+          width: f.image.width,
+          height: f.image.height,
         }))}
         carousel={{ finite: true, padding: "6%" }}
         controller={{ closeOnBackdropClick: true }}
@@ -156,7 +158,9 @@ export function ContactSheet({ frames }: { frames: Frame[] }) {
                   </span>
                 </p>
                 <p className="rebate-type text-paper/60">
-                  {f.edge} · {f.lens} · {f.aperture} · {f.shutter}s · {f.shotAt}
+                  {[f.edge, f.lens, f.aperture, f.shutter && `${f.shutter}s`, f.shotAt]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
             );

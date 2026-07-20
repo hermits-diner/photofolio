@@ -18,43 +18,74 @@ npm run build      # 프로덕션 빌드
 npm run lint
 ```
 
-## 내 사진으로 바꾸기
+## 사진 관리 — Sanity 연결
 
-1. `public/roll/` 에 스캔을 넣습니다. **3:2 비율**(35mm)을 전제로 레이아웃이 잡혀 있습니다.
-2. `src/data/roll.ts` 에서 아래를 수정합니다.
-   - `photographer` — 이름, 도시, 연락처
-   - `roll` — 롤 번호, 필름, 현상 정보
-   - `frames` — 각 컷의 파일 경로, `alt`(화면 낭독기용 설명), 캡션, EXIF. 인화할 컷에 `select: true`
-3. 공유 카드에 쓸 축소본을 만듭니다.
-   ```bash
-   node scripts/generate-placeholders.mjs   # 임시 이미지를 쓰는 동안만
-   ```
-   실제 스캔으로 바꿨다면 `public/roll/thumbs/` 에 같은 이름으로 216×144 축소본을 넣으면 됩니다.
+콘텐츠는 **Sanity**에서 관리합니다. 관리 화면은 별도 호스팅 없이 이 앱의 `/studio` 에 들어 있습니다.
 
-> **이미지를 교체했는데 옛 사진이 보인다면** Next.js 이미지 옵티마이저 캐시입니다. `rm -rf .next/cache/images` 후 재시작하세요.
+연결 전까지 사이트는 `src/data/roll.ts` 의 임시 데이터로 동작하고, `/studio` 는 설정 안내를 보여줍니다. 이 분기는 `src/content.ts` 한 곳에만 있습니다.
 
-현재 들어 있는 사진은 `scripts/generate-placeholders.mjs` 가 생성한 임시 이미지이고, 이름·연락처도 전부 플레이스홀더입니다.
+### 처음 한 번
+
+```bash
+npx sanity login                    # 브라우저가 열립니다
+npx sanity init --env .env.local    # 프로젝트를 만들고 값을 채워줍니다
+```
+
+`.env.local` 에 `NEXT_PUBLIC_SANITY_PROJECT_ID` 가 생기면 연결된 것입니다. 항목은 `.env.example` 을 참고하세요.
+
+이어서 지금의 예시 롤을 그대로 옮겨두면 빈 화면에서 시작하지 않아도 됩니다.
+
+```bash
+node scripts/build-seed-ndjson.mjs
+npx sanity dataset import sanity-seed.ndjson production
+```
+
+> 이 import 는 **추가**입니다. 두 번 실행하면 문서가 중복됩니다.
+
+### 그다음부터
+
+`npm run dev` 후 [/studio](http://localhost:3000/studio) 에서 작업합니다.
+
+| 문서 | 하는 일 |
+|---|---|
+| **사이트 설정** | 이름·도시·소개·연락처. 문서 하나만 존재합니다 |
+| **시리즈** | 주제 하나 = 컨택트시트 한 장. 프레임을 끌어서 순서를 바꾸면 시트도 그대로 바뀝니다 |
+| **프레임** | 스캔 한 장. 업로드하면 EXIF·블러 플레이스홀더·색상이 자동으로 추출됩니다 |
+
+**시리즈는 `공개일` 이 비어 있으면 사이트에 나오지 않습니다.** 작업 중인 롤을 숨겨두는 방법입니다.
+
+`대체 텍스트` 는 필수입니다 — 사진을 볼 수 없는 사람에게 장면을 설명하는 문장이지, 캡션의 복사본이 아닙니다.
+
+### 판매 필드
+
+프레임의 `판매 대상`·`이용 조건 메모` 는 스키마에만 있고 **사이트에서는 아직 아무 일도 하지 않습니다.** 결제·주문·다운로드 권한을 붙일 때 쓰려고 자리만 잡아둔 것입니다.
 
 ## 배포 전에
 
-`src/app/layout.tsx` 의 `metadataBase` 가 환경변수를 읽습니다. 공유 카드(OG 이미지)가 절대경로로 잡히도록 실제 도메인을 넣어주세요.
+`.env` 에 실제 도메인을 넣어야 공유 카드(OG 이미지)가 절대경로로 잡힙니다.
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://example.com
 ```
 
+> **사진을 바꿨는데 옛 이미지가 보인다면** Next.js 이미지 옵티마이저 캐시입니다. `rm -rf .next/cache/images` 후 재시작하세요.
+
 ## 구조
 
 | 경로 | 역할 |
 |---|---|
-| `src/app/page.tsx` | 히어로 · 시트 · 콜로폰 |
-| `src/app/layout.tsx` | 서체 5종, 메타데이터 |
+| `src/content.ts` | **Sanity ↔ 임시 데이터 분기는 여기 하나뿐** |
+| `src/sanity/schemaTypes/` | 관리 화면의 입력 항목 정의 |
+| `src/sanity/lib/queries.ts` | GROQ 쿼리 |
+| `sanity.config.ts` | Studio 설정 (사이드바 구성 포함) |
+| `src/app/(site)/page.tsx` | 시리즈 목록 |
+| `src/app/(site)/series/[slug]/` | 컨택트시트 한 장 |
+| `src/app/studio/` | 관리 화면. `(site)` 밖이라 Lenis가 닿지 않습니다 |
 | `src/app/globals.css` | 색·서체 토큰, `develop` 애니메이션 |
-| `src/app/opengraph-image.tsx` | 공유 카드 (빌드 시 생성) |
+| `src/lib/og-card.tsx` | 공유 카드 (빌드 시 생성) |
 | `src/components/contact-sheet.tsx` | 시트 그리드 + 라이트박스 |
-| `src/components/smooth-scroll.tsx` | Lenis 래퍼 |
-| `src/data/roll.ts` | **사진·정보는 전부 여기** |
-| `scripts/` | 임시 이미지 · 파비콘 생성기 |
+| `src/data/roll.ts` | 임시 데이터. Sanity 연결 후에는 시드 생성에만 쓰입니다 |
+| `scripts/` | 임시 이미지 · 파비콘 · 시드 생성기 |
 
 ### 서체
 

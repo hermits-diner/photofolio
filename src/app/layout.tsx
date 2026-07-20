@@ -7,8 +7,7 @@ import {
   Spline_Sans_Mono,
 } from "next/font/google";
 
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { photographer } from "@/data/roll";
+import { getSettings } from "@/content";
 import "./globals.css";
 
 /*
@@ -54,15 +53,26 @@ const bodyKo = Nanum_Myeongjo({
   weight: ["400", "700"],
 });
 
-export const metadata: Metadata = {
-  // Replace with the production origin so share cards resolve absolutely.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
-  title: `${photographer.name} — 흑백 필름 사진`,
-  description: `${photographer.city}에서 흑백 필름으로 작업하는 ${photographer.name}의 컨택트시트.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return {
+    // Replace with the production origin so share cards resolve absolutely.
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    title: {
+      default: `${settings.name} — 흑백 필름 사진`,
+      template: `%s — ${settings.name}`,
+    },
+    description: `${settings.city}에서 흑백 필름으로 작업하는 ${settings.name}의 컨택트시트.`,
+  };
+}
 
+/**
+ * Deliberately thin: the smooth-scroll wrapper and the site chrome live in
+ * (site)/layout.tsx so that /studio, which is a full application of its own,
+ * inherits nothing but the fonts.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -73,9 +83,7 @@ export default function RootLayout({
       lang="ko"
       className={`${display.variable} ${body.variable} ${data.variable} ${displayKo.variable} ${bodyKo.variable} h-full`}
     >
-      <body className="min-h-full">
-        <SmoothScroll>{children}</SmoothScroll>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
