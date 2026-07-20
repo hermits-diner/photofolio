@@ -23,6 +23,16 @@ const FRAME = /* groq */ `
     "width": metadata.dimensions.width,
     "height": metadata.dimensions.height,
     "lqip": metadata.lqip
+  },
+  // What the camera wrote, extracted by Sanity on upload. The adapter falls
+  // back to these when the hand-entered exposure fields are empty — upload a
+  // scrubbed JPEG and the sheet annotates itself.
+  "exif": image.asset->metadata.exif{
+    FocalLength,
+    FNumber,
+    ExposureTime,
+    "ISO": coalesce(ISO, ISOSpeedRatings),
+    DateTimeOriginal
   }
 `;
 

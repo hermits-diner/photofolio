@@ -11,9 +11,12 @@ export const client = isSanityConfigured
       projectId,
       dataset,
       apiVersion,
-      // Published content only, served from the CDN. Draft previews would
-      // need a read token; that is a separate step from publishing a site.
+      // Published content from the CDN by default; sanityFetch in lib/live.ts
+      // switches to drafts when the Studio's Presentation tab is driving.
       useCdn: true,
       perspective: "published",
+      // Overlay metadata for click-to-edit. Only encoded during draft mode,
+      // so public visitors never receive it.
+      stega: { studioUrl: "/studio" },
     })
   : null;

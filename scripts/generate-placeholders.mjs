@@ -96,6 +96,7 @@ function renderFrame(seed, { key, contrast }) {
 }
 
 const FRAMES = [
+  // Sheet 037 — street: frame-01 … frame-12
   { key: 96, contrast: 1.18 },
   { key: 138, contrast: 1.02 },
   { key: 74, contrast: 1.3 },
@@ -108,6 +109,26 @@ const FRAMES = [
   { key: 128, contrast: 1.06 },
   { key: 152, contrast: 0.95 },
   { key: 118, contrast: 1.2 },
+  // Sheet 041 — portraits: frame-13 … frame-20, keyed darker for window light
+  { key: 84, contrast: 1.28 },
+  { key: 120, contrast: 1.15 },
+  { key: 70, contrast: 1.35 },
+  { key: 105, contrast: 1.2 },
+  { key: 92, contrast: 1.1 },
+  { key: 132, contrast: 1.05 },
+  { key: 78, contrast: 1.3 },
+  { key: 112, contrast: 1.18 },
+  // Sheet 044 — harbor trip: frame-21 … frame-30, lighter and flatter
+  { key: 150, contrast: 0.95 },
+  { key: 165, contrast: 0.9 },
+  { key: 128, contrast: 1.08 },
+  { key: 172, contrast: 0.88 },
+  { key: 142, contrast: 1.0 },
+  { key: 118, contrast: 1.12 },
+  { key: 96, contrast: 1.22 },
+  { key: 80, contrast: 1.3 },
+  { key: 155, contrast: 0.94 },
+  { key: 136, contrast: 1.02 },
 ];
 
 await mkdir(OUT, { recursive: true });

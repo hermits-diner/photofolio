@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const series = await getSeries(slug);
+  const series = await getSeries(slug, { stega: false });
   if (!series) return new Response("Not found", { status: 404 });
 
   const selects = series.frames.filter((f) => f.select).length;

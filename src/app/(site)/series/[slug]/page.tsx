@@ -18,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const series = await getSeries(slug);
+  const series = await getSeries(slug, { stega: false });
   if (!series) return {};
   return {
     title: `${series.title} — Sheet ${series.sheetNumber}`,

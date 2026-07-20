@@ -65,9 +65,13 @@ export const siteSettings = defineType({
       type: "string",
       group: "contact",
     }),
+    // Field name predates the copy change — it now holds the neutral contact
+    // blurb in the colophon, not a solicitation.
     defineField({
       name: "commissionNote",
-      title: "작업 의뢰 안내",
+      title: "연락 문구",
+      description:
+        "푸터의 연락 섹션에 들어가는 한두 문장. 의뢰를 유도하는 문구는 쓰지 않습니다.",
       type: "text",
       rows: 3,
       group: "contact",

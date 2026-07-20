@@ -75,7 +75,7 @@ export function Colophon({ settings }: { settings: Settings }) {
       <div>
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-grease" />
-          <h2 className="font-display text-3xl tracking-tight uppercase">작업 의뢰</h2>
+          <h2 className="font-display text-3xl tracking-tight uppercase">연락</h2>
         </div>
         <p className="mt-4 max-w-sm font-body text-lg leading-relaxed text-rebate/85">
           {settings.commissionNote}

@@ -6,7 +6,10 @@ export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export default async function Image() {
-  const [settings, allSeries] = await Promise.all([getSettings(), getAllSeries()]);
+  const [settings, allSeries] = await Promise.all([
+    getSettings({ stega: false }),
+    getAllSeries({ stega: false }),
+  ]);
   const frames = allSeries.flatMap((s) => s.frames);
   const selects = frames.filter((f) => f.select).length;
 

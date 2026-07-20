@@ -54,7 +54,7 @@ const bodyKo = Nanum_Myeongjo({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
+  const settings = await getSettings({ stega: false });
   return {
     // Replace with the production origin so share cards resolve absolutely.
     metadataBase: new URL(
