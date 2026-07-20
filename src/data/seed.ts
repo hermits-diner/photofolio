@@ -45,12 +45,12 @@ export type SeedSession = {
 
 /**
  * No name, by design — the byline slot holds the project, not a person.
- * The default alias names the working surface, not a genre: every kind of
- * work lands on the same light table.
+ * The default alias names the format, not a genre: everything here is a
+ * sheet, whatever was photographed.
  */
 export const identity = {
-  alias: "라이트테이블",
-  aliasLatin: "Light Table",
+  alias: "CONTACT SHEET",
+  aliasLatin: "CONTACT SHEET",
   city: "Seoul",
   email: "hello@example.com",
   instagram: "@your.handle",

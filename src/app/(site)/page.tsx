@@ -23,9 +23,11 @@ export default async function Page() {
         <h1 className="font-display text-[clamp(3.75rem,13vw,10.5rem)] leading-[0.84] font-medium tracking-[-0.015em] uppercase text-rebate">
           {settings.aliasLatin}
         </h1>
-        <p className="mt-3 font-display text-2xl font-medium tracking-tight sm:text-3xl text-rebate/90">
-          {settings.alias}
-        </p>
+        {settings.alias !== settings.aliasLatin && (
+          <p className="mt-3 font-display text-2xl font-medium tracking-tight sm:text-3xl text-rebate/90">
+            {settings.alias}
+          </p>
+        )}
 
         <p className="mt-8 max-w-md font-body text-lg leading-relaxed text-rebate/85 sm:text-xl">
           {settings.statement}
