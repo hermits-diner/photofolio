@@ -171,7 +171,10 @@ export function Colophon({ settings }: { settings: Settings }) {
           <LogLine label="Email" value={settings.email} />
           <LogLine label="Instagram" value={settings.instagram} />
           <LogLine label="Threads" value={settings.threads} />
-          <LogLine label="Based in" value={`${settings.city}, KR`} />
+          <LogLine
+            label="Based in"
+            value={settings.city ? `${settings.city}, KR` : null}
+          />
         </dl>
 
         <div className="mt-8 flex items-center justify-between border-t border-rebate/10 pt-4">

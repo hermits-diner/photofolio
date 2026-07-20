@@ -65,7 +65,8 @@ export type Series = {
 export type Settings = {
   alias: string;
   aliasLatin: string;
-  city: string;
+  /** Optional on purpose — an anonymous site may say nothing about where. */
+  city: string | null;
   statement: string;
   about: string | null;
   email: string;
