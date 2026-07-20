@@ -44,7 +44,7 @@ export default async function SeriesPage({
       <section className="grid gap-10 pt-12 pb-16 lg:grid-cols-[1.35fr_1fr] lg:gap-16 lg:pt-20 lg:pb-20">
         <div>
           <p className="rebate-type text-silver">
-            {series.stock}
+            {series.genre ?? series.location ?? series.camera}
             <span className="mx-2 text-grease">▸▸▸</span>
             Sheet {series.sheetNumber}
           </p>
@@ -63,16 +63,17 @@ export default async function SeriesPage({
           )}
 
           <p className="note mt-10 text-silver">
-            {series.frames.length}컷 중 {selects}컷 인화 선정
+            {series.frames.length}컷 중 {selects}컷 셀렉트
           </p>
         </div>
 
-        {/* The shooting log — the same data a photographer writes on the sleeve. */}
+        {/* What the session actually was: where, with what, how much of it. */}
         <dl className="self-end lg:pb-3">
           <LogLine label="Sheet" value={series.sheetNumber} />
-          <LogLine label="Stock" value={series.stock} />
-          <LogLine label="Rated" value={series.rated} />
-          <LogLine label="Developer" value={series.developer} />
+          <LogLine label="Genre" value={series.genre} />
+          <LogLine label="Location" value={series.location} />
+          <LogLine label="Camera" value={series.camera} />
+          <LogLine label="Lens" value={series.lenses} />
           <LogLine label="Frames" value={`${series.frames.length}`} />
         </dl>
       </section>
@@ -84,7 +85,7 @@ export default async function SeriesPage({
           </h2>
           <p className="note text-silver">
             프레임을 누르면 크게 볼 수 있습니다 ·{" "}
-            <span className="text-grease">✕</span> 표시는 인화할 컷
+            <span className="text-grease">✕</span> 표시는 셀렉트
           </p>
           <Link href="/" className="rebate-type text-silver hover:text-grease">
             ← 모든 시트

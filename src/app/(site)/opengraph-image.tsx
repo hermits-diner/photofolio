@@ -11,9 +11,11 @@ export default async function Image() {
   const selects = frames.filter((f) => f.select).length;
 
   return renderSheetCard({
-    eyebrow: `${allSeries.length} sheets`,
-    title: settings.latin,
-    meta: `${settings.city} — ${frames.length} frames, ${selects} selects`,
+    eyebrow: `${allSeries.length} sheet${allSeries.length === 1 ? "" : "s"}`,
+    title: settings.aliasLatin,
+    meta: [settings.city, `${frames.length} frames, ${selects} selects`]
+      .filter(Boolean)
+      .join(" — "),
     frames,
   });
 }

@@ -2,9 +2,9 @@ import { DocumentsIcon } from "@sanity/icons/Documents";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 /**
- * A theme, presented as one contact sheet. The film log fields are not
- * decoration — they are the spine of the page's right-hand column, and the
- * sheet number is what the design calls the section.
+ * A theme, presented as one contact sheet. The log fields are not decoration
+ * — they are the spine of the page's right-hand column, and the sheet number
+ * is what the design calls the section.
  *
  * Frames are an ordered list rather than a back-reference so that dragging
  * them in the Studio is the same act as reordering the sheet.
@@ -66,15 +66,34 @@ export const series = defineType({
       to: [{ type: "photo" }],
     }),
 
-    defineField({ name: "stock", title: "필름", type: "string", group: "log" }),
     defineField({
-      name: "rated",
-      title: "감도",
+      name: "genre",
+      title: "분야",
+      description: "스트리트, 인물, 여행 … 목록에서 시트를 구분하는 데 쓰입니다.",
       type: "string",
-      description: "ISO 400, pushed to 1600 …",
       group: "log",
     }),
-    defineField({ name: "developer", title: "현상", type: "string", group: "log" }),
+    defineField({
+      name: "location",
+      title: "지역",
+      description: "서울 중구, 오사카 …",
+      type: "string",
+      group: "log",
+    }),
+    defineField({
+      name: "camera",
+      title: "바디",
+      type: "string",
+      description: "Fujifilm X100V …",
+      group: "log",
+    }),
+    defineField({
+      name: "lenses",
+      title: "렌즈",
+      type: "string",
+      description: "23mm 고정, 35mm · 50mm …",
+      group: "log",
+    }),
     defineField({
       name: "shotOver",
       title: "촬영 기간",
@@ -90,7 +109,7 @@ export const series = defineType({
       description: "목록은 이 순서로 정렬됩니다. 비어 있으면 공개되지 않습니다.",
     }),
   ],
-  groups: [{ name: "log", title: "촬영 기록" }],
+  groups: [{ name: "log", title: "촬영 정보" }],
   orderings: [
     {
       name: "publishedDesc",

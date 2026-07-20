@@ -1,6 +1,6 @@
 import "server-only";
 
-import { frames as seedFrames, photographer, roll } from "@/data/roll";
+import { frames as seedFrames, identity, session } from "@/data/seed";
 import { isSanityConfigured } from "@/sanity/env";
 import { client } from "@/sanity/lib/client";
 import {
@@ -24,7 +24,8 @@ export type FrameImage = {
 
 export type Frame = {
   id: string;
-  edge: string;
+  /** The filename the camera wrote: DSCF1043, _DSC4821 … */
+  frameRef: string;
   slug: string | null;
   alt: string;
   caption: string | null;
@@ -34,6 +35,8 @@ export type Frame = {
   lens: string | null;
   aperture: string | null;
   shutter: string | null;
+  iso: string | null;
+  /** Survived the edit. */
   select: boolean;
   image: FrameImage;
 };
@@ -45,17 +48,19 @@ export type Series = {
   slug: string;
   sheetNumber: string;
   statement: string | null;
-  stock: string | null;
-  rated: string | null;
-  developer: string | null;
+  genre: string | null;
+  location: string | null;
+  camera: string | null;
+  lenses: string | null;
   shotOver: string | null;
   frames: Frame[];
   cover: Frame | null;
 };
 
+/** No legal name anywhere — the byline slot holds a working alias. */
 export type Settings = {
-  name: string;
-  latin: string;
+  alias: string;
+  aliasLatin: string;
   city: string;
   statement: string;
   email: string;
@@ -72,18 +77,7 @@ function formatShotAt(value: string | null | undefined) {
 
 // ── Sanity ──────────────────────────────────────────────────────────────
 
-type SanityFrame = {
-  id: string;
-  edge: string;
-  slug: string | null;
-  alt: string;
-  caption: string | null;
-  place: string | null;
-  shotAt: string | null;
-  lens: string | null;
-  aperture: string | null;
-  shutter: string | null;
-  select: boolean;
+type SanityFrame = Omit<Frame, "image"> & {
   image: { url: string; width: number; height: number; lqip?: string } | null;
 };
 
@@ -116,31 +110,32 @@ function adaptSeries(s: SanitySeries): Series {
   };
 }
 
-/** Content changes when a roll is published, so a minute of staleness is fine. */
+/** Content changes when a session is published, so a minute of staleness is fine. */
 const FRESHNESS = { next: { revalidate: 60 } } as const;
 
 // ── Seed ────────────────────────────────────────────────────────────────
 
 /**
- * The starter roll, shaped like a Sanity result. Everything here is a
+ * The starter session, shaped like a Sanity result. Everything here is a
  * placeholder — it exists so the site builds and renders before a Sanity
  * project is connected, and it stops being used the moment one is.
  */
 function seedSeries(): Series {
   return {
-    id: "seed-roll",
-    title: "롤 037",
-    titleLatin: `Roll ${roll.number}`,
-    slug: `roll-${roll.number}`,
-    sheetNumber: roll.number,
+    id: "seed-session",
+    title: "밤으로 가는 길",
+    titleLatin: "Toward Night",
+    slug: `sheet-${session.number}`,
+    sheetNumber: session.number,
     statement: null,
-    stock: roll.stock,
-    rated: roll.rated,
-    developer: roll.developer,
-    shotOver: roll.shotOver,
+    genre: session.genre,
+    location: session.location,
+    camera: session.camera,
+    lenses: session.lenses,
+    shotOver: session.shotOver,
     frames: seedFrames.map((f, i) => ({
       id: `seed-${i}`,
-      edge: f.edge,
+      frameRef: f.frameRef,
       slug: null,
       alt: f.alt,
       caption: f.caption,
@@ -149,6 +144,7 @@ function seedSeries(): Series {
       lens: f.lens,
       aperture: f.aperture,
       shutter: f.shutter,
+      iso: f.iso,
       select: f.select ?? false,
       image: { url: f.src, width: 1500, height: 1000 },
     })),
@@ -158,16 +154,16 @@ function seedSeries(): Series {
 
 function seedSettings(): Settings {
   return {
-    name: photographer.name,
-    latin: photographer.latin,
-    city: photographer.city,
+    alias: identity.alias,
+    aliasLatin: identity.aliasLatin,
+    city: identity.city,
     statement:
-      "빛이 사라지기 직전의 도시를 찍습니다. 모든 사진은 필름으로 찍고 직접 현상합니다.",
-    email: photographer.email,
-    instagram: photographer.instagram,
+      "거리에서 찍습니다. 대부분은 버리고, 남은 것만 여기에 둡니다. 이름은 밝히지 않습니다.",
+    email: identity.email,
+    instagram: identity.instagram,
     threads: null,
     commissionNote:
-      "인물, 공간, 기록 작업을 받습니다. 촬영 일정과 예산을 함께 보내주시면 사흘 안에 답장합니다.",
+      "촬영 의뢰와 사용 문의를 받습니다. 일정과 용도를 함께 보내주시면 사흘 안에 답장합니다.",
   };
 }
 

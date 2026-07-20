@@ -9,21 +9,21 @@ import type { Frame } from "@/content";
 import { cn } from "@/lib/utils";
 
 /**
- * Adds the develop animation once a strip has actually been scrolled to, so
+ * Adds the resolve animation once a strip has actually been scrolled to, so
  * the image appears as you arrive at it rather than all at once off-screen.
  */
-function useDevelopOnView<T extends HTMLElement>() {
+function useResolveOnView<T extends HTMLElement>() {
   const ref = useRef<T>(null);
-  const [developed, setDeveloped] = useState(false);
+  const [resolved, setResolved] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
-    if (!node || developed) return;
+    if (!node || resolved) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setDeveloped(true);
+          setResolved(true);
           observer.disconnect();
         }
       },
@@ -32,16 +32,18 @@ function useDevelopOnView<T extends HTMLElement>() {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [developed]);
+  }, [resolved]);
 
-  return { ref, developed };
+  return { ref, resolved };
 }
 
 /**
- * The chinagraph ring an editor draws around a frame worth printing. Drawn
- * as an open, slightly-off path — a clean ellipse reads as a UI badge.
+ * The ring drawn around a frame that survived the edit — the one mark an
+ * editor makes on a sheet, borrowed here because nothing else says "this one"
+ * as plainly. Drawn as an open, slightly-off path; a clean ellipse reads as a
+ * UI badge.
  */
-function GreasePencilMark() {
+function SelectMark() {
   return (
     <svg
       className="pointer-events-none absolute inset-0 h-full w-full"
@@ -71,14 +73,14 @@ function Cell({
   index: number;
   onOpen: (index: number) => void;
 }) {
-  const { ref, developed } = useDevelopOnView<HTMLDivElement>();
+  const { ref, resolved } = useResolveOnView<HTMLDivElement>();
 
   return (
     <div ref={ref} className="flex flex-col">
       <button
         type="button"
         onClick={() => onOpen(index)}
-        aria-label={`${frame.edge}번 프레임 크게 보기${frame.caption ? ` — ${frame.caption}` : ""}`}
+        aria-label={`${frame.frameRef} 크게 보기${frame.caption ? ` — ${frame.caption}` : ""}`}
         className="group relative block aspect-3/2 w-full cursor-zoom-in overflow-hidden bg-rebate"
       >
         <Image
@@ -91,18 +93,18 @@ function Cell({
           blurDataURL={frame.image.blurDataURL}
           className={cn(
             "object-cover transition-[filter] duration-500 group-hover:brightness-110",
-            developed && "develops",
+            resolved && "resolves",
           )}
-          style={{ "--develop-delay": `${(index % 4) * 90}ms` } as React.CSSProperties}
+          style={{ "--resolve-delay": `${(index % 4) * 90}ms` } as React.CSSProperties}
         />
-        {frame.select && <GreasePencilMark />}
+        {frame.select && <SelectMark />}
       </button>
 
-      {/* The rebate strip below each frame, where edge numbers print. */}
+      {/* The gutter below each frame, where the file number sits. */}
       <div className="flex items-baseline justify-between gap-2 px-1 py-1.5">
-        <span className="rebate-type text-paper/70">{frame.edge}</span>
+        <span className="rebate-type text-paper/70">{frame.frameRef}</span>
         {frame.select && (
-          <span className="rebate-type text-grease" title="인화할 컷">
+          <span className="rebate-type text-grease" title="셀렉트">
             ✕
           </span>
         )}
@@ -116,11 +118,11 @@ export function ContactSheet({ frames }: { frames: Frame[] }) {
 
   return (
     <>
-      {/* The sheet itself: frames floating in a field of black rebate. */}
+      {/* The sheet itself: frames floating in a black field. */}
       <div className="bg-rebate p-3 shadow-[0_1px_0_var(--color-paper-shade)] sm:p-5">
         <div className="grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4">
           {frames.map((frame, i) => (
-            <Cell key={frame.edge} frame={frame} index={i} onOpen={setOpenAt} />
+            <Cell key={frame.frameRef} frame={frame} index={i} onOpen={setOpenAt} />
           ))}
         </div>
       </div>
@@ -145,7 +147,7 @@ export function ContactSheet({ frames }: { frames: Frame[] }) {
           },
         }}
         render={{
-          // The print laid out with its own data sheet, as it would be filed.
+          // The frame opened, with the exposure that made it.
           slideFooter: () => {
             const f = frames[Math.max(openAt, 0)];
             if (!f) return null;
@@ -158,7 +160,14 @@ export function ContactSheet({ frames }: { frames: Frame[] }) {
                   </span>
                 </p>
                 <p className="rebate-type text-paper/60">
-                  {[f.edge, f.lens, f.aperture, f.shutter && `${f.shutter}s`, f.shotAt]
+                  {[
+                    f.frameRef,
+                    f.lens,
+                    f.aperture,
+                    f.shutter && `${f.shutter}s`,
+                    f.iso && `ISO ${f.iso}`,
+                    f.shotAt,
+                  ]
                     .filter(Boolean)
                     .join(" · ")}
                 </p>

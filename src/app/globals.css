@@ -4,18 +4,21 @@
 /*
   Contact sheet.
 
-  The page is a sheet of fibre paper on a light table, not a dark gallery
-  wall. Frames sit in a black rebate field the way they do on a real proof
-  sheet; the paper margin around it stays light. Colour is doing structural
-  work here, so nothing else needs to.
+  A contact sheet is a record of an edit — everything that was shot, with the
+  survivors marked. That act is the same whether the frames came off a roll
+  or a card, and in street work the edit is most of the craft.
+
+  The page is that sheet on a light table, not a dark gallery wall: frames in
+  a black field, the paper margin around it left light. Colour is doing
+  structural work here, so nothing else needs to.
 */
 @theme {
-  --color-paper: #e9eae6; /* cool fixed RC paper */
+  --color-paper: #e9eae6; /* cool proof paper */
   --color-paper-shade: #dcddd7; /* the sheet's own shadow */
-  --color-rebate: #141310; /* developed silver, warm black */
+  --color-rebate: #141310; /* the black field the frames sit in */
   --color-silver: #6e6f6a; /* captions, secondary data */
-  --color-grease: #c8102e; /* chinagraph — selects only, never decoration */
-  --color-selenium: #241f29; /* selenium-toned scrim behind a print */
+  --color-grease: #c8102e; /* the select mark — never decoration */
+  --color-selenium: #241f29; /* the scrim behind an opened frame */
 
   /* Latin first, Hangul second — the browser falls back per glyph. */
   --font-display: var(--font-barlow-condensed), var(--font-gothic-a1),
@@ -36,8 +39,9 @@ body {
 }
 
 /*
-  Edge lettering — the stamped text along a film rebate. Wide tracking is
-  what makes it read as stamped, so this is for Latin and figures only.
+  The small stamped type a sheet is annotated with — file numbers, counts,
+  labels. Wide tracking is what makes it read as stamped, so this is for
+  Latin and figures only.
 */
 .rebate-type {
   font-family: var(--font-data);
@@ -59,10 +63,11 @@ body {
 }
 
 /*
-  The latent image appearing in developer: flat and pale, then it snaps to
-  a full print scale. One orchestrated moment for the whole page.
+  A preview resolving: the flat embedded thumbnail first, then the full
+  render snapping into its real tonal scale. One orchestrated moment for the
+  whole page.
 */
-@keyframes develop {
+@keyframes resolve {
   from {
     opacity: 0.32;
     filter: brightness(1.55) contrast(0.28);
@@ -75,9 +80,9 @@ body {
   }
 }
 
-.develops {
-  animation: develop 1200ms cubic-bezier(0.22, 0.68, 0.3, 1) both;
-  animation-delay: var(--develop-delay, 0ms);
+.resolves {
+  animation: resolve 1200ms cubic-bezier(0.22, 0.68, 0.3, 1) both;
+  animation-delay: var(--resolve-delay, 0ms);
 }
 
 :focus-visible {
@@ -86,7 +91,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .develops {
+  .resolves {
     animation: none;
   }
   html {

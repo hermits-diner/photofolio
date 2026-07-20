@@ -127,7 +127,7 @@ export async function renderSheetCard({
                     color: "rgba(233,234,230,0.7)",
                   }}
                 >
-                  {f.edge}
+                  {f.frameRef}
                 </span>
                 {f.select && (
                   <div style={{ width: 8, height: 8, background: "#c8102e" }} />

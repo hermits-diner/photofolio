@@ -61,10 +61,10 @@ export async function generateMetadata(): Promise<Metadata> {
       process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
     ),
     title: {
-      default: `${settings.name} — 흑백 필름 사진`,
-      template: `%s — ${settings.name}`,
+      default: `${settings.alias} — 거리 사진`,
+      template: `%s — ${settings.alias}`,
     },
-    description: `${settings.city}에서 흑백 필름으로 작업하는 ${settings.name}의 컨택트시트.`,
+    description: settings.statement,
   };
 }
 

@@ -13,7 +13,8 @@ export function Masthead({
   return (
     <header className="flex items-baseline justify-between gap-4 border-b border-rebate/20 py-4">
       <Link href="/" className="rebate-type hover:text-grease">
-        {settings.latin} — {settings.city}
+        {settings.aliasLatin}
+        {settings.city && ` — ${settings.city}`}
       </Link>
       {right && <p className="rebate-type text-silver">{right}</p>}
     </header>

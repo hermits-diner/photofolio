@@ -18,7 +18,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const selects = series.frames.filter((f) => f.select).length;
 
   return renderSheetCard({
-    eyebrow: series.stock ?? `Sheet ${series.sheetNumber}`,
+    eyebrow: series.genre ?? series.location ?? `Sheet ${series.sheetNumber}`,
     title: series.titleLatin,
     meta: `sheet ${series.sheetNumber} — ${series.frames.length} frames, ${selects} selects`,
     frames: series.frames,

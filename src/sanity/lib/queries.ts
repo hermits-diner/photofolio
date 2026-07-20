@@ -7,7 +7,7 @@ import { defineQuery } from "next-sanity";
  */
 const FRAME = /* groq */ `
   "id": _id,
-  edge,
+  frameRef,
   "slug": slug.current,
   alt,
   caption,
@@ -16,6 +16,7 @@ const FRAME = /* groq */ `
   lens,
   aperture,
   shutter,
+  iso,
   "select": coalesce(select, false),
   "image": image.asset->{
     url,
@@ -32,9 +33,10 @@ const SERIES = /* groq */ `
   "slug": slug.current,
   sheetNumber,
   statement,
-  stock,
-  rated,
-  developer,
+  genre,
+  location,
+  camera,
+  lenses,
   shotOver,
   publishedAt,
   "frames": frames[]->{ ${FRAME} },
@@ -58,6 +60,6 @@ export const seriesSlugsQuery = defineQuery(`
 
 export const settingsQuery = defineQuery(`
   *[_type == "siteSettings"][0] {
-    name, latin, city, statement, email, instagram, threads, commissionNote
+    alias, aliasLatin, city, statement, email, instagram, threads, commissionNote
   }
 `);
