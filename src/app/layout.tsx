@@ -60,8 +60,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
     ),
+    // No genre in the default title — the alias carries the identity and
+    // the statement below carries what the work is.
     title: {
-      default: `${settings.alias} — 거리 사진`,
+      default: settings.alias,
       template: `%s — ${settings.alias}`,
     },
     description: settings.statement,

@@ -43,10 +43,14 @@ export type SeedSession = {
   frames: SeedFrame[];
 };
 
-/** No name, by design — the byline slot holds the project, not a person. */
+/**
+ * No name, by design — the byline slot holds the project, not a person.
+ * The default alias names the working surface, not a genre: every kind of
+ * work lands on the same light table.
+ */
 export const identity = {
-  alias: "거리 파일",
-  aliasLatin: "Street File",
+  alias: "라이트테이블",
+  aliasLatin: "Light Table",
   city: "Seoul",
   email: "hello@example.com",
   instagram: "@your.handle",

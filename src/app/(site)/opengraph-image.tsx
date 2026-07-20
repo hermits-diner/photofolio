@@ -1,7 +1,7 @@
 import { getAllSeries, getSettings } from "@/content";
 import { OG_SIZE, renderSheetCard } from "@/lib/og-card";
 
-export const alt = "흑백 필름 컨택트시트";
+export const alt = "디지털 컨택트시트 아카이브";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

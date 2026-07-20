@@ -31,7 +31,7 @@ docs.push({
   aliasLatin: identity.aliasLatin,
   city: identity.city,
   statement:
-    "거리에서 찍습니다. 대부분은 버리고, 남은 것만 여기에 둡니다. 이름은 밝히지 않습니다.",
+    "거리에서 시작했지만 거리에만 있지는 않습니다. 대부분은 버리고, 남은 것만 여기에 둡니다. 이름은 밝히지 않습니다.",
   email: identity.email,
   instagram: identity.instagram,
   commissionNote: "작업에 대한 이야기와 질문은 이메일로 받습니다.",
