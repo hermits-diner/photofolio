@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 
 import { LogLine } from "@/components/log-line";
 import type { Settings } from "@/content";
+import { GENRES } from "@/lib/genres";
 
 /**
  * The whole site, flat — the shape photographer sites settle on (Kenna:
  * work / upcoming / publications / resume / contact). No store, by policy.
+ * 작업 carries a genre submenu: one stack of sheets per genre.
  */
 const NAV = [
-  { href: "/", label: "시트" },
   { href: "/exhibitions", label: "전시" },
   { href: "/books", label: "사진집" },
   { href: "/about", label: "소개" },
@@ -63,6 +64,42 @@ export function Masthead({
 
       <div className="flex items-center gap-4">
         <nav aria-label="주요 메뉴" className="flex items-center gap-3 sm:gap-4">
+          {/* 작업 + genre submenu. Hover and keyboard focus both open it;
+              on touch the same links live as chips on the home page. */}
+          <div className="group relative">
+            <Link
+              href="/"
+              aria-current={
+                pathname === "/" || pathname.startsWith("/genre") ? "page" : undefined
+              }
+              className={`rebate-type text-xs transition-colors hover:text-grease ${
+                pathname === "/" || pathname.startsWith("/genre")
+                  ? "text-grease font-bold"
+                  : "text-silver"
+              }`}
+            >
+              작업 ▾
+            </Link>
+            <div className="invisible absolute left-1/2 z-50 -translate-x-1/2 pt-3 opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <ul className="min-w-44 rounded border border-rebate/20 bg-paper p-1.5 shadow-lg">
+                {GENRES.map((genre) => (
+                  <li key={genre.slug}>
+                    <Link
+                      href={`/genre/${genre.slug}`}
+                      className={`rebate-type block rounded px-3 py-2 text-xs transition-colors hover:bg-rebate/5 hover:text-grease ${
+                        pathname === `/genre/${genre.slug}`
+                          ? "text-grease font-bold"
+                          : "text-rebate"
+                      }`}
+                    >
+                      {genre.label} SHEET
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
           {NAV.map((item) => (
             <Link
               key={item.href}

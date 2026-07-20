@@ -66,11 +66,17 @@ export const series = defineType({
       to: [{ type: "photo" }],
     }),
 
+    // The list mirrors src/lib/genres.ts — the genre menu matches on these
+    // exact words, so free typing would silently drop a sheet from its page.
+    // 여행 stays for existing sheets; it has no menu of its own yet.
     defineField({
       name: "genre",
       title: "분야",
-      description: "스트리트, 인물, 여행 … 목록에서 시트를 구분하는 데 쓰입니다.",
+      description: "분야별 메뉴(STREET SHEET …)가 이 값으로 시트를 모읍니다.",
       type: "string",
+      options: {
+        list: ["스트리트", "풍경", "인물", "매크로", "건축", "추상", "여행"],
+      },
       group: "log",
     }),
     defineField({
