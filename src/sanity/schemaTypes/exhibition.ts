@@ -209,6 +209,77 @@ export const exhibition = defineType({
     }),
 
     defineField({
+      name: "materials",
+      title: "인쇄물",
+      description:
+        "포스터·엽서·리플릿. 인쇄소에 넘기는 최종 파일과 사양을 전시와 함께 보관합니다.",
+      type: "array",
+      group: "prep",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "printMaterial",
+          title: "인쇄물",
+          fields: [
+            defineField({
+              name: "kind",
+              title: "종류",
+              type: "string",
+              options: {
+                list: ["포스터", "엽서", "리플릿", "현수막", "도록", "기타"],
+              },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "title",
+              title: "이름",
+              description: "A2 오프닝 포스터, 관객 배포용 엽서 …",
+              type: "string",
+            }),
+            defineField({
+              name: "file",
+              title: "인쇄용 파일",
+              description: "인쇄소에 넘기는 최종 파일 그대로 — PDF, AI, 고해상 JPEG.",
+              type: "file",
+            }),
+            defineField({
+              name: "preview",
+              title: "미리보기 이미지",
+              description: "목록에서 알아보기 위한 시안. 없으면 비워두세요.",
+              type: "image",
+            }),
+            defineField({
+              name: "size",
+              title: "규격",
+              description: "A2, 100×148mm …",
+              type: "string",
+            }),
+            defineField({ name: "paper", title: "용지", type: "string" }),
+            defineField({ name: "copies", title: "수량", type: "number" }),
+            defineField({ name: "cost", title: "비용 (원)", type: "number" }),
+            defineField({ name: "memo", title: "메모", type: "text", rows: 2 }),
+          ],
+          preview: {
+            select: {
+              kind: "kind",
+              title: "title",
+              size: "size",
+              copies: "copies",
+              media: "preview",
+            },
+            prepare: ({ kind, title, size, copies, media }) => ({
+              title: title || kind,
+              subtitle: [kind, size, copies != null ? `${copies}부` : null]
+                .filter(Boolean)
+                .join(" · "),
+              media,
+            }),
+          },
+        }),
+      ],
+    }),
+
+    defineField({
       name: "publishedAt",
       title: "공개일",
       description:
