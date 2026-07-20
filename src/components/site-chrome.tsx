@@ -1,10 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { LogLine } from "@/components/log-line";
 import type { Settings } from "@/content";
+
+/**
+ * The whole site, flat — the shape photographer sites settle on (Kenna:
+ * work / upcoming / publications / resume / contact). No store, by policy.
+ */
+const NAV = [
+  { href: "/", label: "시트" },
+  { href: "/exhibitions", label: "전시" },
+  { href: "/books", label: "사진집" },
+  { href: "/about", label: "소개" },
+] as const;
 
 export function Masthead({
   settings,
@@ -32,8 +44,12 @@ export function Masthead({
     return () => clearInterval(interval);
   }, []);
 
+  const pathname = usePathname();
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-rebate/20 bg-paper/90 py-4 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-rebate/20 bg-paper/90 py-4 backdrop-blur-md transition-all">
       <div className="flex items-center gap-3">
         <Link href="/" className="rebate-type hover:text-grease font-bold tracking-widest text-sm">
           {settings.aliasLatin}
@@ -45,13 +61,31 @@ export function Masthead({
         </div>
       </div>
 
-      {right && (
-        <div className="flex items-center gap-2">
-          <p className="rebate-type text-silver bg-rebate/5 px-2.5 py-1 rounded border border-rebate/10">
+      <div className="flex items-center gap-4">
+        <nav aria-label="주요 메뉴" className="flex items-center gap-3 sm:gap-4">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isActive(item.href) ? "page" : undefined}
+              className={`rebate-type text-xs transition-colors hover:text-grease ${
+                isActive(item.href) ? "text-grease font-bold" : "text-silver"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <a href="#contact" className="rebate-type text-xs text-silver hover:text-grease">
+            연락
+          </a>
+        </nav>
+
+        {right && (
+          <p className="rebate-type text-silver bg-rebate/5 px-2.5 py-1 rounded border border-rebate/10 hidden md:block">
             {right}
           </p>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }
@@ -71,7 +105,10 @@ export function Colophon({ settings }: { settings: Settings }) {
   };
 
   return (
-    <footer className="mt-24 grid gap-10 border-t border-rebate/20 py-16 sm:grid-cols-2 lg:mt-32 relative">
+    <footer
+      id="contact"
+      className="mt-24 grid scroll-mt-20 gap-10 border-t border-rebate/20 py-16 sm:grid-cols-2 lg:mt-32 relative"
+    >
       <div>
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-grease" />

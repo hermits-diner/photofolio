@@ -44,6 +44,14 @@ export const siteSettings = defineType({
       type: "text",
       rows: 4,
     }),
+    defineField({
+      name: "about",
+      title: "긴 소개",
+      description:
+        "소개 페이지의 본문. 비워두면 위의 짧은 소개만 나갑니다. 익명 운영이라면 경력 대신 작업 방식과 태도를 씁니다.",
+      type: "text",
+      rows: 8,
+    }),
 
     defineField({
       name: "email",

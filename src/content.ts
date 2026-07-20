@@ -4,7 +4,11 @@ import { identity, sessions, type SeedSession } from "@/data/seed";
 import { isSanityConfigured } from "@/sanity/env";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
+  allBooksQuery,
+  allExhibitionsQuery,
   allSeriesQuery,
+  exhibitionBySlugQuery,
+  exhibitionSlugsQuery,
   seriesBySlugQuery,
   seriesSlugsQuery,
   settingsQuery,
@@ -63,10 +67,54 @@ export type Settings = {
   aliasLatin: string;
   city: string;
   statement: string;
+  about: string | null;
   email: string;
   instagram: string;
   threads: string | null;
   commissionNote: string;
+};
+
+export type ExhibitionWork = {
+  id: string;
+  printSize: string | null;
+  paper: string | null;
+  frame: string | null;
+  edition: string | null;
+  photo: Frame | null;
+};
+
+export type Exhibition = {
+  id: string;
+  title: string;
+  titleLatin: string;
+  slug: string;
+  venue: string | null;
+  address: string | null;
+  /** Already formatted for display — 2026.09.05 */
+  startDate: string | null;
+  endDate: string | null;
+  /** Formatted with time, Seoul — 2026.09.05 18:00 */
+  opening: string | null;
+  statement: string | null;
+  cover: Frame | null;
+  workCount: number;
+  /** Filled on the detail page only. */
+  works: ExhibitionWork[];
+};
+
+export type Book = {
+  id: string;
+  title: string;
+  titleLatin: string;
+  slug: string | null;
+  statement: string | null;
+  trimWidth: number | null;
+  trimHeight: number | null;
+  paper: string | null;
+  binding: string | null;
+  copies: number | null;
+  cover: Frame | null;
+  spreadCount: number;
 };
 
 /**
@@ -135,6 +183,67 @@ function adaptSeries(s: SanitySeries): Series {
   };
 }
 
+/** 2026-09-05T09:00:00Z → 2026.09.05 18:00, pinned to Seoul. */
+function formatOpening(value: string | null | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+}
+
+type SanityExhibition = Omit<
+  Exhibition,
+  "titleLatin" | "cover" | "works" | "workCount"
+> & {
+  titleLatin: string | null;
+  cover: SanityFrame | null;
+  workCount: number | null;
+  works?:
+    | (Omit<ExhibitionWork, "photo"> & { photo: SanityFrame | null })[]
+    | null;
+};
+
+function adaptExhibition(e: SanityExhibition): Exhibition {
+  return {
+    ...e,
+    titleLatin: e.titleLatin || e.title,
+    startDate: formatShotAt(e.startDate),
+    endDate: formatShotAt(e.endDate),
+    opening: formatOpening(e.opening),
+    cover: e.cover ? adaptFrame(e.cover) : null,
+    workCount: e.workCount ?? 0,
+    works: (e.works ?? []).map((w) => ({
+      ...w,
+      photo: w.photo ? adaptFrame(w.photo) : null,
+    })),
+  };
+}
+
+type SanityBook = Omit<Book, "titleLatin" | "cover" | "spreadCount"> & {
+  titleLatin: string | null;
+  cover: SanityFrame | null;
+  spreadCount: number | null;
+};
+
+function adaptBook(b: SanityBook): Book {
+  return {
+    ...b,
+    titleLatin: b.titleLatin || b.title,
+    cover: b.cover ? adaptFrame(b.cover) : null,
+    spreadCount: b.spreadCount ?? 0,
+  };
+}
+
 /**
  * Passed by callers that feed text into places where stega's invisible
  * click-to-edit markers would corrupt the output: <title> tags, OG images,
@@ -196,6 +305,7 @@ function seedSettings(): Settings {
     city: identity.city,
     statement:
       "거리에서 찍습니다. 대부분은 버리고, 남은 것만 여기에 둡니다. 이름은 밝히지 않습니다.",
+    about: null,
     email: identity.email,
     instagram: identity.instagram,
     threads: null,
@@ -240,6 +350,44 @@ export async function getSeriesSlugs(): Promise<string[]> {
     stega: false,
   });
   return (data as { slug: string }[]).map((s) => s.slug);
+}
+
+// The seed has no exhibitions or books — those begin in the Studio, so the
+// pages show their empty state until real ones are published.
+
+export async function getExhibitions(opts: FetchOpts = {}): Promise<Exhibition[]> {
+  if (!sanityFetch) return [];
+  const { data } = await sanityFetch({ query: allExhibitionsQuery, stega: opts.stega });
+  return (data as unknown as SanityExhibition[]).map(adaptExhibition);
+}
+
+export async function getExhibition(
+  slug: string,
+  opts: FetchOpts = {},
+): Promise<Exhibition | null> {
+  if (!sanityFetch) return null;
+  const { data } = await sanityFetch({
+    query: exhibitionBySlugQuery,
+    params: { slug },
+    stega: opts.stega,
+  });
+  return data ? adaptExhibition(data as unknown as SanityExhibition) : null;
+}
+
+export async function getExhibitionSlugs(): Promise<string[]> {
+  if (!sanityFetch) return [];
+  const { data } = await sanityFetch({
+    query: exhibitionSlugsQuery,
+    perspective: "published",
+    stega: false,
+  });
+  return (data as { slug: string }[]).map((s) => s.slug);
+}
+
+export async function getBooks(opts: FetchOpts = {}): Promise<Book[]> {
+  if (!sanityFetch) return [];
+  const { data } = await sanityFetch({ query: allBooksQuery, stega: opts.stega });
+  return (data as unknown as SanityBook[]).map(adaptBook);
 }
 
 export { isSanityConfigured };

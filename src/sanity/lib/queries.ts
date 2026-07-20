@@ -70,6 +70,71 @@ export const seriesSlugsQuery = defineQuery(`
 
 export const settingsQuery = defineQuery(`
   *[_type == "siteSettings"][0] {
-    alias, aliasLatin, city, statement, email, instagram, threads, commissionNote
+    alias, aliasLatin, city, statement, about, email, instagram, threads, commissionNote
   }
+`);
+
+// ── Exhibitions ─────────────────────────────────────────────────────────
+// The public shape only: checklist, budget and print materials are working
+// state and never leave the Studio.
+
+const EXHIBITION_CARD = /* groq */ `
+  "id": _id,
+  title,
+  titleLatin,
+  "slug": slug.current,
+  venue,
+  address,
+  startDate,
+  endDate,
+  opening,
+  statement,
+  "cover": coalesce(cover->{ ${FRAME} }, works[0].photo->{ ${FRAME} }),
+  "workCount": count(works)
+`;
+
+export const allExhibitionsQuery = defineQuery(`
+  *[_type == "exhibition" && defined(publishedAt) && defined(slug.current)]
+    | order(coalesce(startDate, publishedAt) desc) { ${EXHIBITION_CARD} }
+`);
+
+export const exhibitionBySlugQuery = defineQuery(`
+  *[_type == "exhibition" && slug.current == $slug && defined(publishedAt)][0] {
+    ${EXHIBITION_CARD},
+    "works": works[]{
+      "id": _key,
+      printSize,
+      paper,
+      frame,
+      edition,
+      "photo": photo->{ ${FRAME} }
+    }
+  }
+`);
+
+export const exhibitionSlugsQuery = defineQuery(`
+  *[_type == "exhibition" && defined(publishedAt) && defined(slug.current)]
+    { "slug": slug.current }
+`);
+
+// ── Books ───────────────────────────────────────────────────────────────
+// A book goes public when its status reaches 출간 — there is no separate
+// publish date, because the object on paper is the publication.
+
+export const allBooksQuery = defineQuery(`
+  *[_type == "photobook" && status == "published"]
+    | order(_createdAt desc) {
+      "id": _id,
+      title,
+      titleLatin,
+      "slug": slug.current,
+      statement,
+      trimWidth,
+      trimHeight,
+      paper,
+      binding,
+      copies,
+      "cover": coalesce(cover->{ ${FRAME} }, spreads[0].left->{ ${FRAME} }),
+      "spreadCount": count(spreads)
+    }
 `);
