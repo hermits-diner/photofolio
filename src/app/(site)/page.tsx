@@ -10,55 +10,66 @@ import { getAllSeries, getSettings, type Series } from "@/content";
  * edge — enough to recognise the roll without opening it.
  */
 function SheetRow({ series }: { series: Series }) {
-  const strip = series.frames.slice(0, 6);
+  const strip = series.frames.slice(0, 8);
   const selects = series.frames.filter((f) => f.select).length;
 
   return (
     <Link
       href={`/series/${series.slug}`}
-      className="group block border-t border-rebate/20 py-7"
+      className="group block border-t border-rebate/20 py-8 transition-all hover:bg-rebate/5 px-3 -mx-3 rounded-lg"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <h2 className="font-display text-4xl tracking-tight uppercase group-hover:text-grease sm:text-5xl">
+        <h2 className="font-display text-4xl tracking-tight uppercase group-hover:text-grease transition-colors sm:text-5xl flex items-center gap-3">
           Sheet {series.sheetNumber}
+          <span className="text-xs font-sans rebate-type text-silver opacity-0 group-hover:opacity-100 transition-opacity">
+            → 열기
+          </span>
         </h2>
-        <p className="rebate-type text-silver">
-          {series.frames.length} frames
+        <p className="rebate-type text-silver flex items-center gap-2">
+          <span>{series.frames.length} frames</span>
           {selects > 0 && (
-            <>
-              {" / "}
-              <span className="text-grease">{selects} selects</span>
-            </>
+            <span className="bg-grease/10 text-grease border border-grease/30 px-2 py-0.5 rounded-full font-bold">
+              ✕ {selects} selects
+            </span>
           )}
         </p>
       </div>
 
-      <p className="mt-1 flex flex-wrap items-baseline gap-x-3 font-display text-xl font-medium tracking-tight sm:text-2xl">
+      <p className="mt-2 flex flex-wrap items-baseline gap-x-3 font-display text-xl font-medium tracking-tight sm:text-2xl">
         {series.title}
         {series.genre && (
           <span className="note font-normal text-silver">
-            {[series.genre, series.location].filter(Boolean).join(" · ")}
+            {[series.genre, series.location, series.camera].filter(Boolean).join(" · ")}
           </span>
         )}
       </p>
 
-      {/* One strip, bled off the right edge — there is always more sheet. */}
-      <div className="mt-5 -mr-5 flex gap-3 overflow-hidden bg-rebate p-3 sm:-mr-8 lg:-mr-14">
+      {/* Film strip preview with custom scrollbar */}
+      <div className="mt-5 flex gap-3 overflow-x-auto bg-rebate p-3 sm:p-4 rounded-sm border border-black/40 film-scrollbar shadow-inner">
         {strip.map((frame) => (
           <div
             key={frame.id}
-            className="relative aspect-3/2 w-40 shrink-0 overflow-hidden sm:w-52"
+            className="relative aspect-3/2 w-44 shrink-0 overflow-hidden rounded-sm sm:w-56 group/frame"
           >
             <Image
               src={frame.image.url}
               alt=""
               fill
-              sizes="(max-width: 640px) 160px, 208px"
-              quality={60}
+              sizes="(max-width: 640px) 176px, 224px"
+              quality={70}
               placeholder={frame.image.blurDataURL ? "blur" : "empty"}
               blurDataURL={frame.image.blurDataURL}
-              className="object-cover transition-[filter] duration-500 group-hover:brightness-110"
+              className="object-cover transition-all duration-500 group-hover:brightness-110 group-hover/frame:scale-105"
             />
+            {frame.select && (
+              <div className="absolute top-1 right-1 bg-grease text-white font-mono text-[9px] px-1.5 py-0.5 rounded font-bold shadow">
+                ✕
+              </div>
+            )}
+            <div className="absolute bottom-0 inset-x-0 bg-rebate/80 px-2 py-1 text-[9px] font-mono text-paper/70 flex justify-between">
+              <span>{frame.frameRef}</span>
+              {frame.aperture && <span>{frame.aperture}</span>}
+            </div>
           </div>
         ))}
       </div>
@@ -78,10 +89,13 @@ export default async function Page() {
       />
 
       <section className="pt-12 pb-16 lg:pt-20 lg:pb-24">
-        <h1 className="font-display text-[clamp(3.75rem,13vw,10.5rem)] leading-[0.84] font-medium tracking-[-0.015em] uppercase">
+        <div className="inline-block bg-rebate/5 border border-rebate/10 px-3 py-1 rounded text-xs rebate-type text-silver mb-4">
+          DIGITAL CONTACT SHEET ARCHIVE
+        </div>
+        <h1 className="font-display text-[clamp(3.75rem,13vw,10.5rem)] leading-[0.84] font-medium tracking-[-0.015em] uppercase text-rebate">
           {settings.aliasLatin}
         </h1>
-        <p className="mt-3 font-display text-2xl font-medium tracking-tight sm:text-3xl">
+        <p className="mt-3 font-display text-2xl font-medium tracking-tight sm:text-3xl text-rebate/90">
           {settings.alias}
         </p>
 
@@ -89,9 +103,10 @@ export default async function Page() {
           {settings.statement}
         </p>
 
-        <p className="note mt-10 text-silver">
-          ↓ 시트 {allSeries.length}장 · 모두 {totalFrames}컷
-        </p>
+        <div className="note mt-10 text-silver flex items-center gap-3">
+          <span className="h-1.5 w-1.5 rounded-full bg-grease" />
+          <span>시트 {allSeries.length}장 · 모두 {totalFrames}컷 프레임</span>
+        </div>
       </section>
 
       <section aria-label="시리즈">
@@ -110,3 +125,4 @@ export default async function Page() {
     </main>
   );
 }
+
