@@ -64,6 +64,15 @@ npx sanity dataset import sanity-seed.ndjson production
 
 **프레임 목록에는 세 가지 보기가 있습니다** — 모든 프레임 / 셀렉트 / 미배치(어느 시트에도 안 걸린 컷, 즉 할 일 목록).
 
+**수십 장은 "일괄 업로드" 탭으로.** Studio 상단의 일괄 업로드 탭에 JPEG을 끌어다 놓고 시트를 고르면 끝입니다 — 업로드 전에 브라우저 안에서 스크럽(GPS·시리얼·MakerNote 제거)까지 자동으로 하므로 별도 준비가 필요 없습니다. 파일명이 그대로 파일 번호가 되고, 같은 파일을 다시 올려도 중복되지 않습니다. 대체 텍스트만 프레임별로 채우면 됩니다.
+
+터미널이 편하면 같은 일을 하는 스크립트도 있습니다:
+
+```bash
+npx sanity exec scripts/upload-batch.mjs --with-user-token -- --folder <스크럽된 폴더> --series sheet-037
+# --dry-run 을 붙이면 뭐가 만들어질지만 보여줍니다.
+```
+
 **Presentation 탭에서 실시간 프리뷰가 됩니다.** Studio 상단의 Presentation 아이콘을 누르면 실제 사이트가 옆에 뜨고, 미공개 수정이 저장하는 즉시 반영됩니다. 텍스트를 클릭하면 해당 입력 필드로 바로 이동합니다. 이 기능은 `.env.local` 의 `SANITY_API_READ_TOKEN` (viewer 토큰) 이 있어야 동작합니다 — `.env.example` 참고.
 
 **시리즈는 `공개일` 이 비어 있으면 사이트에 나오지 않습니다.** 작업 중인 세션을 숨겨두는 방법입니다.

@@ -1,5 +1,6 @@
 "use client";
 
+import { UploadIcon } from "@sanity/icons/Upload";
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
@@ -8,6 +9,7 @@ import { structureTool, type StructureBuilder } from "sanity/structure";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 import { resolve } from "@/sanity/presentation";
 import { schemaTypes } from "@/sanity/schemaTypes";
+import { BatchUploadTool } from "@/sanity/tools/batch-upload";
 
 /**
  * Site settings is a singleton — one document, edited in place. Listing it
@@ -96,5 +98,13 @@ export default defineConfig({
       previewUrl: { previewMode: { enable: "/api/draft-mode/enable" } },
     }),
     visionTool({ defaultApiVersion: apiVersion }),
+  ],
+  tools: [
+    {
+      name: "batch-upload",
+      title: "일괄 업로드",
+      icon: UploadIcon,
+      component: BatchUploadTool,
+    },
   ],
 });
